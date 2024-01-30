@@ -63,14 +63,13 @@ public class GeneradorBD {
         return codigo.toString();
     }
 
-    private static void insertarPersonajes(Connection conexion, int cantidadPersonajes, int cantidadUsuarios) throws SQLException {
+   
+    private static void insertarPersonajes(Connection conexion, int cantidadPersonajes) throws SQLException {
         String insertPersonajeQuery = "INSERT INTO Personajes (nombre, usuario_id) VALUES (?, ?)";
         try (PreparedStatement statement = conexion.prepareStatement(insertPersonajeQuery)) {
-            Random random = new Random();
             for (int i = 1; i <= cantidadPersonajes; i++) {
-                String nombrePersonaje = NOMBRES_PERSONAJES[random.nextInt(NOMBRES_PERSONAJES.length)];
-                statement.setString(1, nombrePersonaje);
-                statement.setInt(2, (i % cantidadUsuarios) + 1);
+                statement.setString(1, "Personaje" + i);
+                statement.setInt(2, i % 50 + 1);  // Asociar personajes a usuarios existentes
                 statement.addBatch();
             }
             statement.executeBatch();
