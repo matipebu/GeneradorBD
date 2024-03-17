@@ -4,57 +4,43 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class Conexion {
-    private static String SERVER="localhost";
-    private static String PUERTO="3306";
-    private static String DATABASE="juego";
-    private static String USER="root";
-    private static String PASSWORD="root";
-    private static Conexion conexionBDInstance;
-    private Connection conn;
+    private static final String SERVER = "localhost";
+    private static final String PUERTO = "3306";
+    private static final String DATABASE = "juego";
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
+    private static Connection instancia;
 
-    private Conexion(){
-        abrirConexion();
-    }
 
-    public static Conexion getConexion(){
-        if (conexionBDInstance == null){
-            conexionBDInstance = new Conexion();
+    public static synchronized Connection getInstancia() {
+        if (instancia == null) {
+            instancia = crearConexion();
         }
-        return conexionBDInstance;
+        return instancia;
     }
 
-    public Connection getConnection(){
-        try {
-            if(conn.isClosed()||conn==null){
-                abrirConexion();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return conn;
-    }
-
-
-    private void abrirConexion(){
+    private static Connection crearConexion() {
         Properties propiedades = new Properties();
-        propiedades.put("user",USER);
-        propiedades.put("password",PASSWORD);
+        propiedades.put("user", USER);
+        propiedades.put("password", PASSWORD);
+        Connection conn = null;
         try {
-            this.conn = DriverManager.getConnection("jdbc:mysql://"+SERVER+":"+PUERTO+"/"+DATABASE,propiedades);
+            conn = DriverManager.getConnection("jdbc:mysql://" + SERVER + ":" + PUERTO + "/" + DATABASE + "?rewriteBatchedStatements=true", propiedades);
         } catch (SQLException e) {
             System.err.println("Error al abrir conexión");
             e.printStackTrace();
         }
+        return conn;
     }
 
-    public void cerrarConexion(){
-        if(conn!=null){
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+    public static synchronized void close() {
+
+        try {
+            if (instancia != null) {
+                instancia.close();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

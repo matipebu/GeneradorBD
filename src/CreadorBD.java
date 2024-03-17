@@ -1,29 +1,21 @@
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class CreadorBD {
     public static void main(String[] args) {
         crearTablas();
         GeneradorBD.generarDatos();
-        
     }
+    
     public static void crearTablas() {
-        try (Connection conexion = Conexion.getConexion().getConnection()) {
-            try (PreparedStatement statement = conexion.prepareStatement(CREAR_TABLAS_QUERY_SERVIDORES)) {
-                statement.executeUpdate();
-            }
-            try (PreparedStatement statement = conexion.prepareStatement(CREAR_TABLAS_QUERY_USUARIOS)) {
-                statement.executeUpdate();
-            }
-            try (PreparedStatement statement = conexion.prepareStatement(CREAR_TABLAS_QUERY_PERSONAJES)) {
-                statement.executeUpdate();
-            }
-            try (PreparedStatement statement = conexion.prepareStatement(CREAR_TABLAS_QUERY_MAPAS)) {
-                statement.executeUpdate();
-            }
-            try (PreparedStatement statement = conexion.prepareStatement(CREAR_TABLAS_QUERY_ZONAS)) {
-                statement.executeUpdate();
+        try (Connection conexion = Conexion.getInstancia()) {
+            try (Statement statement = conexion.createStatement()) {
+                statement.executeUpdate(CREAR_TABLAS_QUERY_SERVIDORES);
+                statement.executeUpdate(CREAR_TABLAS_QUERY_USUARIOS);
+                statement.executeUpdate(CREAR_TABLAS_QUERY_PERSONAJES);
+                statement.executeUpdate(CREAR_TABLAS_QUERY_MAPAS);
+                statement.executeUpdate(CREAR_TABLAS_QUERY_ZONAS);
             }
         } catch (SQLException e) {
             e.printStackTrace();

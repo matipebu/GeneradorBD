@@ -13,7 +13,7 @@ public class GeneradorBD {
     private static final String[] NOMBRES_ZONAS = {"ClaroDelBosque", "CuevaOscura", "ArboledaMística", "TundraHelada", "RuinasEncantadas", "CráterVolcánico", "OasisEscondido", "PantanoEmbrujado", "CavernaCristalina", "OasisDesértico", "TierrasAltasCelestiales", "LaberintoSubterráneo", "TemploAntiguo", "PicoTronante", "FosoÍgneo", "ProfundidadesOceánicas", "CiénagaBrumosa", "LlanurasEternas", "CamposDorados", "AcantiladosPlateados"};
 
     public static void generarDatos() {
-        try (Connection conexion = Conexion.getConexion().getConnection()) {
+        try (Connection conexion = Conexion.getInstancia()) {
             insertarServidores(conexion, 10);
             insertarUsuarios(conexion, 50);
             insertarPersonajes(conexion, 100);
@@ -67,14 +67,17 @@ public class GeneradorBD {
     private static void insertarPersonajes(Connection conexion, int cantidadPersonajes) throws SQLException {
         String insertPersonajeQuery = "INSERT INTO Personajes (nombre, usuario_id) VALUES (?, ?)";
         try (PreparedStatement statement = conexion.prepareStatement(insertPersonajeQuery)) {
+            Random random = new Random();
             for (int i = 1; i <= cantidadPersonajes; i++) {
-                statement.setString(1, "Personaje" + i);
-                statement.setInt(2, i % 50 + 1);  // Asociar personajes a usuarios existentes
+                String nombrePersonaje = NOMBRES_PERSONAJES[random.nextInt(NOMBRES_PERSONAJES.length)];
+                statement.setString(1, nombrePersonaje);
+                statement.setInt(2, i % 50 + 1);  
                 statement.addBatch();
             }
             statement.executeBatch();
         }
     }
+    
 
     private static void insertarMapas(Connection conexion, int cantidadMapas) throws SQLException {
         String insertMapaQuery = "INSERT INTO Mapas (nombre, dificultad, servidor_id) VALUES (?, ?, ?)";
@@ -83,8 +86,8 @@ public class GeneradorBD {
             for (int i = 1; i <= cantidadMapas; i++) {
                 String nombreMapa = NOMBRES_MAPAS[random.nextInt(NOMBRES_MAPAS.length)];
                 statement.setString(1, nombreMapa);
-                statement.setInt(2, i % 10);  // Dificultad de 0 a 9
-                statement.setInt(3, i % 10 + 1);  // Asociar mapas a servidores existentes
+                statement.setInt(2, i % 10); 
+                statement.setInt(3, i % 10 + 1);  
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -98,8 +101,8 @@ public class GeneradorBD {
             for (int i = 1; i <= cantidadZonas; i++) {
                 String nombreZona = NOMBRES_ZONAS[random.nextInt(NOMBRES_ZONAS.length)];
                 statement.setString(1, nombreZona);
-                statement.setInt(2, random.nextInt(100) + 1);  // Ancho de 1 a 100
-                statement.setInt(3, random.nextInt(100) + 1);  // Alto de 1 a 100
+                statement.setInt(2, random.nextInt(100) + 1); 
+                statement.setInt(3, random.nextInt(100) + 1); 
                 statement.setInt(4, i % 20 + 1);  
                 statement.addBatch();
             }
